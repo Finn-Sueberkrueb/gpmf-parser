@@ -8,9 +8,17 @@ ifneq ($(OS),Windows_NT)
 	endif
 endif
 
+# Targets for gpmfdemo
 gpmfdemo : GPMF_demo.o GPMF_parser.o GPMF_utils.o GPMF_mp4reader.o GPMF_print.o
 		gcc -o gpmfdemo GPMF_demo.o GPMF_parser.o GPMF_utils.o GPMF_mp4reader.o GPMF_print.o $(ASAN_FLAGS)
 
+# Targets for csv_writer
+csv_writer : csv_writer.o GPMF_parser.o GPMF_utils.o GPMF_mp4reader.o GPMF_print.o
+		gcc -o csv_writer csv_writer.o GPMF_parser.o GPMF_utils.o GPMF_mp4reader.o GPMF_print.o $(ASAN_FLAGS)
+
+# Object files
+csv_writer.o : csv_writer.c
+		gcc -g -c csv_writer.c
 GPMF_demo.o : GPMF_demo.c
 		gcc -g -c GPMF_demo.c
 GPMF_mp4reader.o : GPMF_mp4reader.c ../GPMF_parser.h
@@ -21,5 +29,7 @@ GPMF_parser.o : ../GPMF_parser.c ../GPMF_parser.h
 		gcc -g -c ../GPMF_parser.c
 GPMF_utils.o : ../GPMF_utils.c ../GPMF_utils.h
 		gcc -g -c ../GPMF_utils.c
+
+# Clean up
 clean :
-		rm gpmfdemo *.o
+		rm gpmfdemo csv_writer *.o

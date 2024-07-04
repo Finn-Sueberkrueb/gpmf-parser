@@ -34,3 +34,5 @@
 
 # pkg-config files
 /*.pc
+demo/csv_writer
+demo/gpmfdemo
