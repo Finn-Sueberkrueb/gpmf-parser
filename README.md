@@ -52,7 +52,7 @@ Run on your own video(s) by mounting an `/input` directory (or individual files 
 docker run -v "/path/to/my/movie.mp4:/input.mp4" runsascoded/gpmf-parser
 ```
 
-### Setup
+### Setup Demo
 
 Clone the project from Github (git clone https://github.com/gopro/gpmf-parser).
 
@@ -69,6 +69,18 @@ This will return a brief overview of what metadata is stored in the given video 
 ```bash
 ./gpmfdemo ../samples/Fusion.mp4 -g
 ```
+
+### Setup CSV Writer
+
+```bash
+cd gpmf-parser/demo/
+make csv_writer 
+./csv_writer ../samples/Fusion.mp4
+```
+This will extract ACCL + GYRO and save it with the interpolated timestamps.
+
+user csv_visulizer.py to visulize the data.
+
 
 ### Sample Code
 
