@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
+#include <dirent.h>
 #include "../GPMF_parser.h"
 #include "GPMF_mp4reader.h"
 #include "../GPMF_utils.h"
@@ -16,17 +17,40 @@ int main(int argc, char *argv[])
 {
     if (argc < 2)
     {
-        printf("Usage: %s <input_mp4_file>\n", argv[0]);
+        printf("Usage: %s <input_directory>\n", argv[0]);
         return -1;
     }
 
-    GPMF_ERR ret = readMP4FileAndWriteCSV(argv[1]);
-
-    if (ret != GPMF_OK)
+    struct dirent *entry;
+    DIR *dp = opendir(argv[1]);
+    if (dp == NULL)
     {
-        printf("Error reading MP4 file or writing CSV file\n");
+        perror("opendir");
+        return -1;
     }
 
+    while ((entry = readdir(dp)))
+    {
+        if (entry->d_type == DT_REG)
+        {
+            // Check if file has .MP4 extension
+            char *dot = strrchr(entry->d_name, '.');
+            if (dot && strcmp(dot, ".MP4") == 0)
+            {
+                char filepath[1024];
+                snprintf(filepath, sizeof(filepath), "%s/%s", argv[1], entry->d_name);
+
+                GPMF_ERR ret = readMP4FileAndWriteCSV(filepath);
+
+                if (ret != GPMF_OK)
+                {
+                    printf("Error reading MP4 file or writing CSV file for %s\n", entry->d_name);
+                }
+            }
+        }
+    }
+
+    closedir(dp);
     return 0;
 }
 
@@ -43,6 +67,11 @@ GPMF_ERR readMP4FileAndWriteCSV(char *filename)
     char csv_filename[1024];
     strncpy(csv_filename, filename, sizeof(csv_filename) - 5);
     csv_filename[sizeof(csv_filename) - 5] = '\0'; // Ensure null termination
+    char *dot = strrchr(csv_filename, '.');
+    if (dot)
+    {
+        *dot = '\0';
+    }
     strcat(csv_filename, ".csv");
 
     // Open the CSV file in write mode
